@@ -1,0 +1,17 @@
+nav#navigation-example.navbar.navbar-expand-lg.navbar-transparent.navbar-absolute.fixed-top
+          .container-fluid
+            .navbar-wrapper
+              a.navbar-brand(href='/') Dashboard
+            button.navbar-toggler(type='button' data-toggle='collapse' aria-controls='navigation-index' aria-expanded='false' aria-label='Toggle navigation' data-target='#navigation-example')
+              span.sr-only Toggle navigation
+              span.navbar-toggler-icon.icon-bar
+              span.navbar-toggler-icon.icon-bar
+              span.navbar-toggler-icon.icon-bar
+            .collapse.navbar-collapse.justify-content-end
+              ul.navbar-nav
+                li.nav-item.dropdown
+                  a#navbarDropdownMenuLink.nav-link(href='javscript:void(0)' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
+                    i.material-icons person
+                    p.d-lg-none.d-md-block Account
+                  .dropdown-menu.dropdown-menu-right(aria-labelledby='navbarDropdownMenuLink')
+                    a.dropdown-item(href='/logout') Logout

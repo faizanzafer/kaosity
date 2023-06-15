@@ -1,0 +1,33 @@
+extends Layout/index.pug
+
+block content
+  .row
+    .col-md-12
+      .card
+        .card-header.card-header-primary
+          h4.card-title Users
+          p.card-category
+            | List of all users
+        .card-body
+          .table-responsive
+            table#dataTable.table.table-hover(width='100%' cellspacing='0')
+              thead
+                tr
+                  th Email
+                  th Social Login
+                  th Current Points
+                  th
+              tbody
+                each user in users                    
+                    tr
+                      td #{user.email}
+                      td #{user.social_auth_provider}
+                      td #{user.current_points}
+                      td
+
+block script
+    // Page level plugins
+    script(src='../assets/vendor/datatables/jquery.dataTables.min.js')
+    script(src='../assets/vendor/datatables/dataTables.bootstrap4.min.js')
+    // Page level custom scripts
+    script(src='../assets/js/demo/datatables-demo.js')

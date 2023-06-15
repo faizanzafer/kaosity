@@ -1,0 +1,33 @@
+extends Layout/index.pug
+
+block content
+    .row
+        .col-xl-12.col-lg-12.col-md-12.col-sm-12
+            // Page Heading
+            .card.mb-4.border-left-success
+                .card-body
+                    .d-sm-flex.align-items-center.justify-content-between
+                        h1.my-1.h3.text-gray-800 Upload Questions
+    .card.shadow.mb-4
+        .card-header.py-3
+            h6.m-0.font-weight-bold.text-primary Upload Questions
+        .card-body
+            .justify-content-center.align-items-center.d-flex
+                form.needs-validation(method='post' action='/quiz/question_update' enctype='multipart/form-data')
+                    .form-row
+                        .col-md-12.col-lg-12.col-sm-12.mb-3(style='padding: 0;')
+                            input#validationTooltip01.form-control(type='file' placeholder='Upload Questions CSV' value='' required='' name='csv_file' autofocus='')
+                            .valid-tooltip
+                                | Looks good!
+                    button.btn.btn-primary(type='submit') Upload CSV
+block script
+    if success
+      script.
+        const _success = "#{success}";
+        console.log(_success)
+        md.showNotification('top','right',_success,'success')
+    if error
+      script.
+        const _error = "#{error}";
+        console.log(_error)
+        md.showNotification('top','right',_error,'danger')

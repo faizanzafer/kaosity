@@ -1,0 +1,27 @@
+extends Layout/index.pug
+
+
+block content
+  .row
+    .col-lg-12
+      a(href="/quiz/quiz_categories/new")#quiz_new.col-lg-2.btn.btn-primary.float-right Create New
+
+    each quiz_category in quiz_categories
+      a(href="/quiz/quiz_categories/quiz_questions/"+quiz_category.id).col-xl-4.col-lg-12
+        #quiz_card.card.card-chart(style="text-align: center; display:block;margin-left:auto;margin-right:auto")
+          .card-header.card-header-success(style='')
+            img(src=quiz_category.image, alt="Category Image" style='width:100%')
+          .card-body    
+            h4.card-title #{quiz_category.name}
+
+block script
+  // Page level plugins
+  script(src='../assets/vendor/datatables/jquery.dataTables.min.js')
+  script(src='../assets/vendor/datatables/dataTables.bootstrap4.min.js')
+  // Page level custom scripts
+  script(src='../assets/js/demo/datatables-demo.js')
+  if success 
+    script.
+      const _success = "#{success}";
+      console.log(_success)
+      md.showNotification('top','right',_success,'success')

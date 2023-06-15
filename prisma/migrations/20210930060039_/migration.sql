@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Users" ADD COLUMN     "crowns" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "diamonds" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "game_closed_at" TIMESTAMP(3);

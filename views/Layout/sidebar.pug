@@ -1,0 +1,60 @@
+.sidebar(data-color='purple' data-background-color='black' data-image='/assets/img/sidebar-2.jpg')
+        //
+          Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
+          Tip 2: you can also add an image using data-image tag
+        .logo
+          a.simple-text.logo-normal(href='/')
+            img(src="/assets/img/logo.png", alt="Logo" height="80")
+        .sidebar-wrapper
+          ul.nav
+            if page=='/' 
+              li.nav-item.active
+                a.nav-link(href='/')
+                  i.material-icons dashboard
+                  p Dashboard
+            else
+              li.nav-item
+                a.nav-link(href='/')
+                  i.material-icons dashboard
+                  p Dashboard
+            if page=='/users'
+              li.nav-item.active
+                a.nav-link(href='/users')
+                  i.material-icons person
+                  p Users
+            else 
+              li.nav-item
+                a.nav-link(href='/users')
+                  i.material-icons person
+                  p Users
+            if page=='/quiz'
+              li.nav-item.active
+                a.nav-link(href='/quiz/quiz_questions')
+                  i.material-icons quiz
+                  p Quiz Questions
+            else 
+              li.nav-item
+                a.nav-link(href='/quiz/quiz_questions')
+                  i.material-icons quiz
+                  p Quiz Questions
+            //- if page=='/quiz'
+            //-   li.nav-item.active
+            //-     a.nav-link(href='/quiz/quiz_categories')
+            //-       i.material-icons quiz
+            //-       p Quiz Categories
+            //- else 
+            //-   li.nav-item
+            //-     a.nav-link(href='/quiz/quiz_categories')
+            //-       i.material-icons quiz
+            //-       p Quiz Categories
+            //- each quiz in quizes 
+            //-   if page=='/'+quiz.id
+            //-     li.nav-item.active
+            //-       a.nav-link(href=`/questions_upload/`+quiz.id)
+            //-         i.material-icons question_answer
+            //-         p #{quiz.name}
+            //-   else
+            //-     li.nav-item
+            //-       a.nav-link(href=`/questions_upload/`+quiz.id)
+            //-         i.material-icons question_answer
+            //-         p #{quiz.name}

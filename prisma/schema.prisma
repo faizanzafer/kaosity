@@ -1,0 +1,383 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                           String             @id @default(cuid())
+  user_name                    String?            @db.VarChar(150)
+  firstname                    String?            @db.VarChar(150)
+  // lastname                  String?   @db.VarChar(150)
+  email                        String             @db.VarChar(150)
+  title                        String?            @db.VarChar(150)
+  phone                        String?            @db.VarChar(150)
+  dob                          String?            @db.VarChar(150)
+  country                      String?            @db.VarChar(150)
+  password                     String?            @db.VarChar(150)
+  social_auth_provider         String             @default("no") @db.VarChar(150)
+  social_auth_provider_user_id String?            @db.VarChar(150)
+  is_social_register           Boolean            @default(false)
+  is_registered                Boolean            @default(false)
+  role                         UserRole           @default(USER)
+  avatar_url                   String?            @db.VarChar(150)
+  fcm_token                    String?
+  current_points               Int                @default(0)
+  diamonds                     Int                @default(5)
+  diamonds_refilled_at         DateTime           @default(now())
+  crowns                       Int                @default(5)
+  crowns_refilled_at           DateTime           @default(now())
+  weekly_points                Int                @default(0)
+  monthly_points               Int                @default(0)
+  xp                           Int                @default(0)
+  level                        Int                @default(1)
+  achievement_level            Int                @default(1)
+  description_flag             Boolean            @default(false)
+  show_notifications           Boolean            @default(true)
+  app_closed_at                DateTime           @default(now())
+  created_at                   DateTime           @default(now())
+  updated_at                   DateTime           @updatedAt
+  my_items                     UserItems[]
+  my_prizes                    UserPrizes[]
+  my_titles                    UserTitles[]
+  my_avatars                   UserAvatars[]
+  my_collectables              UserCollectables[]
+  my_achievements              UserAchievements[]
+  i_send_requests              Friends[]          @relation("i_send_requests")
+  requests_send_to_me          Friends[]          @relation("requests_send_to_me")
+  friend_requests_sender       FriendUsers[]      @relation("i_send_friend_requests")
+  friend_requests_reciever     FriendUsers[]      @relation("friend_requests_send_to_me")
+  notification_sender          Notifications[]    @relation("send_requests_i")
+  notification_reciever        Notifications[]    @relation("send_to_me_requests")
+  matches_where_i_invited      Matches[]          @relation("matches_where_i_invited")
+  matches_i_starts             Matches[]          @relation("matches_i_starts")
+  winned_matches               Matches[]          @relation("winned_matches")
+  my_claimed_bonus             ClaimDailyBonus[]
+}
+
+model Friends {
+  id                 String        @id @default(cuid())
+  status             RequestStatus @default(PENDING)
+  created_at         DateTime      @default(now())
+  updated_at         DateTime      @updatedAt
+  user_id            String
+  friend_user_id     String
+  i_send_request     Users         @relation("i_send_requests", fields: [user_id], references: [id])
+  request_send_to_me Users         @relation("requests_send_to_me", fields: [friend_user_id], references: [id])
+}
+
+model FriendUsers {
+  id                        String              @id @default(cuid())
+  user_id                   String
+  friend_user_id            String
+  status                    FriendRequestStatus @default(PENDING)
+  created_at                DateTime            @default(now())
+  updated_at                DateTime            @updatedAt
+  i_send_friend_request     Users               @relation("i_send_friend_requests", fields: [user_id], references: [id])
+  friend_request_send_to_me Users               @relation("friend_requests_send_to_me", fields: [friend_user_id], references: [id])
+  notifications             Notifications[]     @relation("friend_request")
+}
+
+model Notifications {
+  id                       String           @id @default(cuid())
+  sender                   String
+  reciever_id              String
+  notification_type        NotificationType
+  notification_data        String?
+  match_id                 String?
+  friend_request_id        String?
+  seen                     Boolean          @default(false)
+  created_at               DateTime         @default(now())
+  updated_at               DateTime         @updatedAt
+  request_vs_match         Matches?         @relation("match_vs", fields: [match_id], references: [id])
+  friend_requests          FriendUsers?     @relation("friend_request", fields: [friend_request_id], references: [id])
+  i_send_match_request     Users            @relation("send_requests_i", fields: [sender], references: [id])
+  match_request_send_to_me Users            @relation("send_to_me_requests", fields: [reciever_id], references: [id])
+}
+
+model ResetPassword {
+  id              String   @id @default(cuid())
+  user_identifier String   @db.VarChar(150)
+  otp             Int
+  is_verified     Boolean  @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model QuizQuestions {
+  id            String   @id @default(cuid())
+  // quizId        String
+  questionBody  String   @db.VarChar(255)
+  options       String   @db.VarChar(150)
+  correctOption String   @db.VarChar(150)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  // quiz          QuizCategories @relation(fields: [quizId], references: [id])
+}
+
+model Matches {
+  id                              String          @id @default(cuid())
+  match_type                      MatchType
+  match_deficulty                 MatchDeficulty
+  user_id                         String
+  friend_user_id                  String
+  winner_id                       String?
+  user_points                     Int?
+  friend_user_points              Int?
+  winner_points                   Int?
+  match_status_for_user_id        MatchStatus     @default(ACTIVE)
+  match_status_for_friend_user_id MatchStatus     @default(PENDING)
+  created_at                      DateTime        @default(now())
+  updated_at                      DateTime        @updatedAt
+  match_invited_to                Users           @relation("matches_where_i_invited", fields: [friend_user_id], references: [id])
+  match_starter                   Users           @relation("matches_i_starts", fields: [user_id], references: [id])
+  match_winner                    Users?          @relation("winned_matches", fields: [winner_id], references: [id])
+  notifications                   Notifications[] @relation("match_vs")
+}
+
+model ShopItems {
+  id                   String        @id @default(cuid())
+  name                 String?
+  description          String?
+  picture_url          String?
+  quantity             Int
+  price                Float
+  type                 ShopItemsType
+  created_at           DateTime      @default(now())
+  updated_at           DateTime      @updatedAt
+  shop_items_for_users UserItems[]
+  shop_prize_for_users UserPrizes[]
+}
+
+model UserItems {
+  id           String    @id @default(cuid())
+  user_id      String
+  shop_item_id String
+  quantity     Int
+  user         Users     @relation(references: [id], fields: [user_id])
+  shop_item    ShopItems @relation(references: [id], fields: [shop_item_id])
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+}
+
+model UserPrizes {
+  id             String    @id @default(cuid())
+  user_id        String
+  shop_item_id   String
+  is_prize_given Boolean   @default(false)
+  user           Users     @relation(references: [id], fields: [user_id])
+  shop_item      ShopItems @relation(references: [id], fields: [shop_item_id])
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+}
+
+model XPLevel {
+  id          String   @id @default(cuid())
+  level       Int
+  xp_required Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Achievements {
+  id                     String                  @id @default(cuid())
+  level                  Int
+  created_at             DateTime                @default(now())
+  updated_at             DateTime                @updatedAt
+  achievement_conditions AchievementConditions[]
+}
+
+model AchievementConditions {
+  id             String                    @id @default(cuid())
+  achievement_id String
+  condition_type AchievementConditionTypes
+  condition_qty  Int
+  reward_type    AchievementRewardsTypes
+  reward_qty     Int
+  reward         String?
+  created_at     DateTime                  @default(now())
+  updated_at     DateTime                  @updatedAt
+  achievement    Achievements              @relation(fields: [achievement_id], references: [id])
+}
+
+model DailyBonus {
+  id                 String               @id @default(cuid())
+  reward_type        DailyBonusRewardType
+  reward_qty         Int
+  day_no             Int?
+  pic_url            String
+  claimed_pic_url    String?
+  un_claimed_pic_url String?
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  claimed            ClaimDailyBonus[]
+}
+
+model ClaimDailyBonus {
+  id         String     @id @default(cuid())
+  user_id    String
+  bonus_id   String
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  user       Users      @relation(fields: [user_id], references: [id])
+  bonus      DailyBonus @relation(fields: [bonus_id], references: [id])
+}
+
+model UserAchievements {
+  id                 String                    @id @default(cuid())
+  user_id            String
+  level              Int
+  condition_type     AchievementConditionTypes
+  condition_qty_done Int                       @default(0)
+  is_completed       Boolean                   @default(false)
+  is_seen            Boolean                   @default(false)
+  is_reward_claimed  Boolean                   @default(false)
+  created_at         DateTime                  @default(now())
+  updated_at         DateTime                  @updatedAt
+  user               Users                     @relation(fields: [user_id], references: [id])
+}
+
+model UserTitles {
+  id         String   @id @default(cuid())
+  user_id    String
+  title      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       Users    @relation(fields: [user_id], references: [id])
+}
+
+model Districts {
+  id                   String                 @id @default(cuid())
+  name                 String
+  complete_picture_url String
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  collectables         DistrictCollectables[]
+}
+
+model DistrictCollectables {
+  id                String             @id @default(cuid())
+  district_id       String
+  picture_url       String
+  row               Int                @default(1)
+  column            Int                @default(1)
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  district          Districts          @relation(references: [id], fields: [district_id])
+  user_collectables UserCollectables[]
+}
+
+model UserCollectables {
+  id             String               @id @default(cuid())
+  collectable_id String
+  user_id        String
+  created_at     DateTime             @default(now())
+  updated_at     DateTime             @updatedAt
+  user           Users                @relation(references: [id], fields: [user_id])
+  collectable    DistrictCollectables @relation(references: [id], fields: [collectable_id])
+}
+
+model UserAvatars {
+  id         String   @id @default(cuid())
+  url        String
+  name       String
+  user_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user Users @relation(fields: [user_id], references: [id])
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum MatchType {
+  SOLO
+  VSFRIEND
+}
+
+enum MatchStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+}
+
+enum MatchDeficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ShopItemsType {
+  PRIZES
+  COSMETICS
+  COINS
+  POWERUPS
+  SPECIAL_OFFER
+}
+
+enum AchievementConditionTypes {
+  PLAY_SOLO_GAMES
+  // COMPLETE_SOLO_GAMES
+  COLLECT_COMIC_PIECES
+  FIND_COLLECTABLE_PIECES
+  ANSWERS_CORRECTLY
+  ANSWERS_CORRECTLY_IN_ROW
+  LEVEL_REACH
+  CHALLENGE_MATCHES
+  WIN_CHALLENGE_MATCHES
+  WIN_CHALLENGE_MATCHES_WITHOUT_ITEM_USE
+  COINS_EARN
+  COINS_SPEND
+  MONTHLY_BONUS_CLAIMS
+  ITEMS_USE
+  KAOS_VISIOS_ITEM_USE
+  MICROPHONE_ITEM_USE
+  DO_OVER_ITEM_USE
+  TIME_ZONE_ITEM_USE
+  COMPLETE_CHAPTER_2_OF_STEVE_STORY
+}
+
+enum AchievementRewardsTypes {
+  TITLE
+  COINS
+  DIAMONDS
+  PROFILE_PICTURE
+  ALL_ITEMS
+  ITEMS_DO_OVER_TIME_ZONE
+  ITEMS_KAOS_VISION_MICROPHONE
+}
+
+enum DailyBonusRewardType {
+  TITLE
+  COINS
+  DIAMONDS
+  PROFILE_PICTURE
+  ALL_ITEMS
+  ITEMS_DO_OVER_TIME_ZONE
+  ITEMS_KAOS_VISION_MICROPHONE
+  KAOS_VISION_REWARD
+  DO_OVER_REWARD
+}
+
+enum NotificationType {
+  MATCH_REQUEST
+  RESULT
+  FRIEND
+  ACCEPT_FRIEND
+}

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Matches" ALTER COLUMN "winner_id" SET DATA TYPE TEXT;
+
+-- AddForeignKey
+ALTER TABLE "Matches" ADD FOREIGN KEY ("winner_id") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
